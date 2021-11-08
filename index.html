@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Socket</title>
+    <script src="https://cdn.socket.io/4.2.0/socket.io.min.js" integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="users_counter"></div>
+<input id="input" type="text" autofocus>
+<button id="button">Send</button>
+<div id="messages"></div>
+<div id="messages1"></div>
+<div id="messages2"></div>
+<script>
+    const socket = io('localhost:5555');
+    const users = document.querySelector('#users_counter');
+    const messagesBlock = document.querySelector('#messages');
+    const messagesBlock1 = document.querySelector('#messages1');
+    const messagesBlock2 = document.querySelector('#messages2');
+    const sendButton = document.querySelector('#button');
+    const input = document.querySelector('#input');
+
+    sendButton.onclick = () => {
+        const data = {
+            message: input.value,
+        };
+
+        socket.emit('client-msg', data);
+
+        input.value = ''; 
+        const counter = document.querySelector('#counter'); 
+        console.log(counter);
+        if (counter)  {
+            counter.remove();
+        }
+    }
+
+    socket.on('connect', () => {
+        console.log("Hi!")
+    });
+
+    socket.on('server-msg2', data2 => {
+        users.insertAdjacentHTML('afterbegin', `<div id="counter" class="counter">Users quantity: ${data2.counter}  </div>`);
+        messagesBlock2.insertAdjacentHTML('afterbegin', `<div>User: <span style="color: #008000;"> [${data2.message}] </span> just connected  </div>`);
+    });
+
+    socket.on('server-msg', data => {
+        users.insertAdjacentHTML('afterbegin', `<div id="counter" class="counter">Users quantity: ${data.counter}  </div>`);
+        messagesBlock.insertAdjacentHTML('afterbegin', `<div>message: <span style="color: #dc143c;"> [[${data.message}]] </span> from user <span style="color: #dc143c;">  [${data.user}] </span> </div>`);
+    });
+
+    socket.on('server-msg1', data1 => {
+        messagesBlock1.insertAdjacentHTML('afterbegin', `<div>User: <span style="color: #1e90ff;"> [${data1.message}] </span> disconnected  </div>`);
+    });
+
+</script>
+</body>
+</html>
